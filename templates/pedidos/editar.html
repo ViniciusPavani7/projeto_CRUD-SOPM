@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Editar Pedido</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label for="produto">Produto</label>
+            <select class="form-control" id="produto" name="produto" required>
+                {% for produto in produtos %}
+                <option value="{{ produto.id_produto }}" {% if pedido.id_produto == produto.id_produto %}selected{% endif %}>
+                    {{ produto.nome }} - R$ {{ "%.2f"|format(produto.price) }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="qnt_itens">Quantidade</label>
+            <input type="number" class="form-control" id="qnt_itens" name="qnt_itens" value="{{ pedido.qnt_itens }}" required min="1">
+        </div>
+        <div class="form-group">
+            <label for="status">Status</label>
+            <select class="form-control" id="status" name="status" required>
+                <option value="Novo" {% if pedido.status == 'Novo' %}selected{% endif %}>Novo</option>
+                <option value="Processado" {% if pedido.status == 'Processado' %}selected{% endif %}>Processado</option>
+                <option value="Enviado" {% if pedido.status == 'Enviado' %}selected{% endif %}>Enviado</option>
+                <option value="Cancelado" {% if pedido.status == 'Cancelado' %}selected{% endif %}>Cancelado</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Salvar</button>
+        <a href="{{ url_for('main.listar_pedidos') }}" class="btn btn-secondary mt-3">Cancelar</a>
+    </form>
+</div>
+{% endblock %} 

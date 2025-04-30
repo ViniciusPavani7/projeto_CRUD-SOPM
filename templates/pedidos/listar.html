@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Lista de Pedidos</h2>
+    
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <!-- Ordenação -->
+                <div class="col-md-3">
+                    <label for="ordenacao" class="form-label">Ordenar por data:</label>
+                    <select name="ordenacao" id="ordenacao" class="form-select" onchange="this.form.submit()">
+                        <option value="recente" {% if ordenacao_atual == 'recente' %}selected{% endif %}>Mais recente primeiro</option>
+                        <option value="antigo" {% if ordenacao_atual == 'antigo' %}selected{% endif %}>Mais antigo primeiro</option>
+                    </select>
+                </div>
+                
+                <!-- Filtro de Data -->
+                <div class="col-md-3">
+                    <label for="data" class="form-label">Filtrar por data:</label>
+                    <input type="date" class="form-control" id="data" name="data" value="{{ data_filtro }}">
+                </div>
+                
+                <!-- Filtro de Nome -->
+                <div class="col-md-3">
+                    <label for="nome" class="form-label">Filtrar por nome do produto:</label>
+                    <input type="text" class="form-control" id="nome" name="nome" value="{{ nome_filtro }}" placeholder="Nome do produto">
+                </div>
+                
+                <!-- Filtro de ID -->
+                <div class="col-md-2">
+                    <label for="id" class="form-label">Filtrar por ID:</label>
+                    <input type="text" class="form-control" id="id" name="id" value="{{ id_filtro }}" placeholder="ID do pedido">
+                </div>
+                
+                <!-- Botões -->
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabela de Pedidos -->
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Produto</th>
+                    <th>Quantidade</th>
+                    <th>Status</th>
+                    <th>Data</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pedido in pedidos %}
+                <tr>
+                    <td>{{ pedido.id_pedido }}</td>
+                    <td>{{ pedido.produto.nome }}</td>
+                    <td>{{ pedido.quantidade }}</td>
+                    <td>
+                        <span class="badge {% if pedido.status == 'Novo' %}bg-primary{% elif pedido.status == 'Processando' %}bg-info{% elif pedido.status == 'Enviado' %}bg-success{% elif pedido.status == 'Cancelado' %}bg-danger{% else %}bg-secondary{% endif %}">
+                            {{ pedido.status }}
+                        </span>
+                    </td>
+                    <td>{{ pedido.data.strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td>
+                        <div class="btn-group">
+                            <form action="{{ url_for('main.atualizar_status_pedido', id=pedido.id_pedido) }}" method="POST" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()" {% if pedido.status == 'Cancelado' %}disabled{% endif %}>
+                                    <option value="Novo" {% if pedido.status == 'Novo' %}selected{% endif %}>Novo</option>
+                                    <option value="Processando" {% if pedido.status == 'Processando' %}selected{% endif %}>Processando</option>
+                                    <option value="Enviado" {% if pedido.status == 'Enviado' %}selected{% endif %}>Enviado</option>
+                                    <option value="Cancelado" {% if pedido.status == 'Cancelado' %}selected{% endif %}>Cancelado</option>
+                                </select>
+                            </form>
+                            
+                            {% if pedido.status != 'Cancelado' %}
+                            <form action="{{ url_for('main.atualizar_status_pedido', id=pedido.id_pedido) }}" method="POST" class="d-inline ms-2">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="status" value="Cancelado">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja cancelar este pedido?')">
+                                    Cancelar
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %} 

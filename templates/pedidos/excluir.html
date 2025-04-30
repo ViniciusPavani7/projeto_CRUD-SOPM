@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Excluir Pedido</h2>
+    <p>Tem certeza que deseja excluir o pedido #{{ pedido.id_pedido }}?</p>
+    <form method="POST">
+        <button type="submit" class="btn btn-danger">Confirmar Exclusão</button>
+        <a href="{{ url_for('main.listar_pedidos') }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %} 

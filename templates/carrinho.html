@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Seu Carrinho</h2>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% if carrinho %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Quantidade</th>
+                    <th>Preço Unitário</th>
+                    <th>Subtotal</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in carrinho %}
+                <tr>
+                    <td>{{ item.nome }}</td>
+                    <td>
+                        <form action="{{ url_for('main.atualizar_quantidade', produto_id=item.id_produto) }}" method="POST" class="d-flex align-items-center" style="max-width: 150px;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="input-group">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="this.parentElement.querySelector('input').stepDown()">-</button>
+                                <input type="number" name="quantidade" value="{{ item.qnt_itens }}" min="1" class="form-control form-control-sm text-center" onchange="this.form.submit()">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="this.parentElement.querySelector('input').stepUp()">+</button>
+                            </div>
+                        </form>
+                    </td>
+                    <td>R$ {{ "%.2f"|format(item.preco) }}</td>
+                    <td>R$ {{ "%.2f"|format(item.preco * item.qnt_itens) }}</td>
+                    <td>
+                        <form action="{{ url_for('main.remover_do_carrinho', produto_id=item.id_produto) }}" method="POST" style="display: inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-danger btn-sm">Remover</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                    <td>R$ {{ "%.2f"|format(total) }}</td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <div class="text-end mt-3">
+        <a href="{{ url_for('main.home') }}" class="btn btn-secondary">Continuar Comprando</a>
+        <form action="{{ url_for('main.limpar_carrinho') }}" method="POST" style="display: inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-danger">Limpar Carrinho</button>
+        </form>
+        <form action="{{ url_for('main.finalizar_carrinho') }}" method="POST" style="display: inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-primary">Finalizar Pedido</button>
+        </form>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        Seu carrinho está vazio. <a href="{{ url_for('main.home') }}">Continue comprando</a>!
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 
