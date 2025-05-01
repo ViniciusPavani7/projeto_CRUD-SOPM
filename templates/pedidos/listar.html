@@ -8,36 +8,39 @@
     <div class="card mb-4">
         <div class="card-body">
             <form method="GET" class="row g-3">
-                <!-- Ordenação -->
-                <div class="col-md-3">
-                    <label for="ordenacao" class="form-label">Ordenar por data:</label>
-                    <select name="ordenacao" id="ordenacao" class="form-select" onchange="this.form.submit()">
-                        <option value="recente" {% if ordenacao_atual == 'recente' %}selected{% endif %}>Mais recente primeiro</option>
-                        <option value="antigo" {% if ordenacao_atual == 'antigo' %}selected{% endif %}>Mais antigo primeiro</option>
-                    </select>
+                <div class="col-md-2">
+                    <label for="id" class="form-label">ID do Pedido</label>
+                    <input type="number" class="form-control" id="id" name="id" value="{{ id_filtro }}">
                 </div>
-                
-                <!-- Filtro de Data -->
                 <div class="col-md-3">
-                    <label for="data" class="form-label">Filtrar por data:</label>
+                    <label for="nome" class="form-label">Nome do Produto</label>
+                    <input type="text" class="form-control" id="nome" name="nome" value="{{ nome_filtro }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="data" class="form-label">Data</label>
                     <input type="date" class="form-control" id="data" name="data" value="{{ data_filtro }}">
                 </div>
-                
-                <!-- Filtro de Nome -->
-                <div class="col-md-3">
-                    <label for="nome" class="form-label">Filtrar por nome do produto:</label>
-                    <input type="text" class="form-control" id="nome" name="nome" value="{{ nome_filtro }}" placeholder="Nome do produto">
-                </div>
-                
-                <!-- Filtro de ID -->
                 <div class="col-md-2">
-                    <label for="id" class="form-label">Filtrar por ID:</label>
-                    <input type="text" class="form-control" id="id" name="id" value="{{ id_filtro }}" placeholder="ID do pedido">
+                    <label for="ordenacao" class="form-label">Ordenar por Data</label>
+                    <select class="form-select" id="ordenacao" name="ordenacao">
+                        <option value="">Selecione...</option>
+                        <option value="recente" {% if ordenacao_atual == 'recente' %}selected{% endif %}>Mais recente</option>
+                        <option value="antigo" {% if ordenacao_atual == 'antigo' %}selected{% endif %}>Mais antigo</option>
+                    </select>
                 </div>
-                
-                <!-- Botões -->
-                <div class="col-md-1 d-flex align-items-end">
+                <div class="col-md-2">
+                    <label for="status" class="form-label">Status</label>
+                    <select class="form-select" id="status" name="status">
+                        <option value="">Todos</option>
+                        <option value="Novo" {% if request.args.get('status') == 'Novo' %}selected{% endif %}>Novo</option>
+                        <option value="Processando" {% if request.args.get('status') == 'Processando' %}selected{% endif %}>Processando</option>
+                        <option value="Enviado" {% if request.args.get('status') == 'Enviado' %}selected{% endif %}>Enviado</option>
+                        <option value="Cancelado" {% if request.args.get('status') == 'Cancelado' %}selected{% endif %}>Cancelado</option>
+                    </select>
+                </div>
+                <div class="col-12">
                     <button type="submit" class="btn btn-primary">Filtrar</button>
+                    <a href="{{ url_for('main.listar_pedidos') }}" class="btn btn-secondary">Limpar Filtros</a>
                 </div>
             </form>
         </div>
@@ -67,7 +70,7 @@
                             {{ pedido.status }}
                         </span>
                     </td>
-                    <td>{{ pedido.data.strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td>{{ pedido.date.strftime('%d/%m/%Y %H:%M') }}</td>
                     <td>
                         <div class="btn-group">
                             <form action="{{ url_for('main.atualizar_status_pedido', id=pedido.id_pedido) }}" method="POST" class="d-inline">

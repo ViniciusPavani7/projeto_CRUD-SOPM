@@ -1,8 +1,8 @@
 from flask import Flask, redirect, url_for
 from dotenv import load_dotenv
 import os
-from extensions import db
 from urllib.parse import quote_plus
+from extensions import db, migrate
 from flask_wtf.csrf import CSRFProtect
 
 # Carrega as variáveis de ambiente
@@ -19,6 +19,7 @@ def create_app():
 
     # Inicializa as extensões
     db.init_app(app)
+    migrate.init_app(app, db)
     csrf = CSRFProtect(app)
 
     # Registra o Blueprint

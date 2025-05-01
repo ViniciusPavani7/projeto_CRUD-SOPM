@@ -22,6 +22,46 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-2">
+                    <label for="id_produto" class="form-label">ID do Produto</label>
+                    <input type="number" class="form-control" id="id_produto" name="id_produto" value="{{ request.args.get('id_produto', '') }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="nome" class="form-label">Nome</label>
+                    <input type="text" class="form-control" id="nome" name="nome" value="{{ request.args.get('nome', '') }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="id_market" class="form-label">ID Market</label>
+                    <input type="text" class="form-control" id="id_market" name="id_market" value="{{ request.args.get('id_market', '') }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="ordem_preco" class="form-label">Ordenar por Preço</label>
+                    <select class="form-select" id="ordem_preco" name="ordem_preco">
+                        <option value="">Selecione...</option>
+                        <option value="maior" {% if request.args.get('ordem_preco') == 'maior' %}selected{% endif %}>Maior Preço</option>
+                        <option value="menor" {% if request.args.get('ordem_preco') == 'menor' %}selected{% endif %}>Menor Preço</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="ordem_estoque" class="form-label">Ordenar por Estoque</label>
+                    <select class="form-select" id="ordem_estoque" name="ordem_estoque">
+                        <option value="">Selecione...</option>
+                        <option value="maior" {% if request.args.get('ordem_estoque') == 'maior' %}selected{% endif %}>Maior Estoque</option>
+                        <option value="menor" {% if request.args.get('ordem_estoque') == 'menor' %}selected{% endif %}>Menor Estoque</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                    <a href="{{ url_for('main.listar_produtos') }}" class="btn btn-secondary">Limpar Filtros</a>
+                </div>
+            </form>
+        </div>
+    </div>
     
     <table class="table">
         <thead>
@@ -41,7 +81,7 @@
                 <td>{{ produto.id_produto }}</td>
                 <td>{{ produto.nome }}</td>
                 <td>{{ produto.descricao }}</td>
-                <td>{{ produto.price }}</td>
+                <td>R$ {{ "%.2f"|format(produto.price|float) }}</td>
                 <td>{{ produto.stock }}</td>
                 <td>{{ produto.id_market }}</td>
                 <td>

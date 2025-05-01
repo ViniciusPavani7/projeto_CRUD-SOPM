@@ -20,5 +20,5 @@ class Pedido(db.Model):
     id_pedido = db.Column(db.Integer, primary_key=True, autoincrement=True)
     id_produto = db.Column(db.Integer, db.ForeignKey('produtos.id_produto'), nullable=False)
     qnt_itens = db.Column(db.Integer, nullable=False)
-    date = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(pytz.timezone('America/Sao_Paulo')))
+    date = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.Enum('Novo', 'Processando', 'Enviado', 'Cancelado'), default='Novo') 

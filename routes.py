@@ -100,7 +100,35 @@ def atualizar_status_pedido(id):
 # Rotas para Produtos
 @bp.route('/produtos/')
 def listar_produtos():
-    produtos = Produto.query.all()
+    # Obtém os parâmetros de filtro
+    id_produto = request.args.get('id_produto', '').strip()
+    nome = request.args.get('nome', '').strip()
+    id_market = request.args.get('id_market', '').strip()
+    ordem_preco = request.args.get('ordem_preco', '')
+    ordem_estoque = request.args.get('ordem_estoque', '')
+    
+    # Query base
+    query = Produto.query
+    
+    # Aplica filtros
+    if id_produto:
+        query = query.filter(Produto.id_produto == id_produto)
+    if nome:
+        query = query.filter(Produto.nome.ilike(f'%{nome}%'))
+    if id_market:
+        query = query.filter(Produto.id_market.ilike(f'%{id_market}%'))
+    
+    # Aplica ordenação
+    if ordem_preco == 'maior':
+        query = query.order_by(Produto.price.desc())
+    elif ordem_preco == 'menor':
+        query = query.order_by(Produto.price.asc())
+    elif ordem_estoque == 'maior':
+        query = query.order_by(Produto.stock.desc())
+    elif ordem_estoque == 'menor':
+        query = query.order_by(Produto.stock.asc())
+    
+    produtos = query.all()
     return render_template('produtos/listar.html', produtos=produtos)
 
 @bp.route('/produtos/novo/', methods=['GET', 'POST'])
@@ -150,61 +178,40 @@ def excluir_produto(id):
 # Rotas para Pedidos
 @bp.route('/pedidos')
 def listar_pedidos():
-    # Obtém os parâmetros de filtro
-    ordenacao = request.args.get('ordenacao', 'recente')  # 'recente' ou 'antigo'
-    data_filtro = request.args.get('data', '')  # formato: YYYY-MM-DD
-    nome_filtro = request.args.get('nome', '').strip()
-    id_filtro = request.args.get('id', '').strip()
-    
-    # Query base
-    query = Pedido.query
-    
-    # Aplica filtro de data se fornecido
+    # Obter parâmetros de filtro
+    id_filtro = request.args.get('id', '')
+    nome_filtro = request.args.get('nome', '')
+    data_filtro = request.args.get('data', '')
+    ordenacao = request.args.get('ordenacao', 'recente')
+    status_filtro = request.args.get('status', '')
+
+    # Construir a query base
+    query = Pedido.query.join(Produto)
+
+    # Aplicar filtros
+    if id_filtro:
+        query = query.filter(Pedido.id_pedido == id_filtro)
+    if nome_filtro:
+        query = query.filter(Produto.nome.ilike(f'%{nome_filtro}%'))
     if data_filtro:
-        try:
-            data = datetime.strptime(data_filtro, '%Y-%m-%d')
-            query = query.filter(db.func.date(Pedido.date) == data.date())
-        except ValueError:
-            pass
-    
-    # Aplica ordenação
-    if ordenacao == 'recente':
-        query = query.order_by(Pedido.date.desc())
-    else:
+        data = datetime.strptime(data_filtro, '%Y-%m-%d')
+        query = query.filter(db.func.date(Pedido.date) == data.date())
+    if status_filtro:
+        query = query.filter(Pedido.status == status_filtro)
+
+    # Aplicar ordenação
+    if ordenacao == 'antigo':
         query = query.order_by(Pedido.date.asc())
-    
+    else:  # recente é o padrão
+        query = query.order_by(Pedido.date.desc())
+
     pedidos = query.all()
-    pedidos_com_produtos = []
-    
-    # Define o timezone de Brasília
-    tz = pytz.timezone('America/Sao_Paulo')
-    
-    for pedido in pedidos:
-        produto = Produto.query.get(pedido.id_produto)
-        
-        # Aplica filtros de nome e ID
-        if nome_filtro and nome_filtro.lower() not in produto.nome.lower():
-            continue
-        if id_filtro and str(pedido.id_pedido) != id_filtro:
-            continue
-            
-        # Converte a data para o timezone de Brasília
-        data_brasilia = pedido.date.astimezone(tz)
-        pedido_info = {
-            'id_pedido': pedido.id_pedido,
-            'produto': produto,
-            'quantidade': pedido.qnt_itens,
-            'status': pedido.status,
-            'data': data_brasilia
-        }
-        pedidos_com_produtos.append(pedido_info)
-    
     return render_template('pedidos/listar.html', 
-                         pedidos=pedidos_com_produtos,
-                         ordenacao_atual=ordenacao,
-                         data_filtro=data_filtro,
+                         pedidos=pedidos,
+                         id_filtro=id_filtro,
                          nome_filtro=nome_filtro,
-                         id_filtro=id_filtro)
+                         data_filtro=data_filtro,
+                         ordenacao_atual=ordenacao)
 
 @bp.route('/pedidos/novo/', methods=['GET', 'POST'])
 def novo_pedido():
