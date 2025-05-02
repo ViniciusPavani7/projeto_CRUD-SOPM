@@ -29,8 +29,7 @@
                 <tr>
                     <td>{{ item.nome }}</td>
                     <td>
-                        <form action="{{ url_for('main.atualizar_quantidade', produto_id=item.id_produto) }}" method="POST" class="d-flex align-items-center" style="max-width: 150px;">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <form action="{{ url_for('cart.atualizar_quantidade', produto_id=item.produto_id) }}" method="POST" class="d-flex align-items-center" style="max-width: 150px;">
                             <div class="input-group">
                                 <button type="button" class="btn btn-outline-secondary btn-sm" onclick="this.parentElement.querySelector('input').stepDown()">-</button>
                                 <input type="number" name="quantidade" value="{{ item.qnt_itens }}" min="1" class="form-control form-control-sm text-center" onchange="this.form.submit()">
@@ -38,17 +37,16 @@
                             </div>
                         </form>
                     </td>
-                    <td>R$ {{ "%.2f"|format(item.preco) }}</td>
-                    <td>R$ {{ "%.2f"|format(item.preco * item.qnt_itens) }}</td>
+                    <td>R$ {{ "%.2f"|format(item.produto.price) }}</td>
+                    <td>R$ {{ "%.2f"|format(item.produto.price * item.qnt_itens) }}</td>
                     <td>
-                        <form action="{{ url_for('main.remover_do_carrinho', produto_id=item.id_produto) }}" method="POST" style="display: inline;">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <form action="{{ url_for('cart.remover_do_carrinho', produto_id=item.produto_id) }}" method="POST" style="display: inline;">
                             <button type="submit" class="btn btn-danger btn-sm">Remover</button>
                         </form>
                     </td>
                 </tr>
                 {% endfor %}
-            </tbody>
+            </tbody>preco
             <tfoot>
                 <tr>
                     <td colspan="3" class="text-end"><strong>Total:</strong></td>
@@ -60,12 +58,10 @@
     </div>
     <div class="text-end mt-3">
         <a href="{{ url_for('main.home') }}" class="btn btn-secondary">Continuar Comprando</a>
-        <form action="{{ url_for('main.limpar_carrinho') }}" method="POST" style="display: inline;">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <form action="{{ url_for('cart.finalizar_carrinho') }}" method="POST" style="display: inline;">
             <button type="submit" class="btn btn-danger">Limpar Carrinho</button>
         </form>
-        <form action="{{ url_for('main.finalizar_carrinho') }}" method="POST" style="display: inline;">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <form action="{{ url_for('cart.finalizar_carrinho') }}" method="POST" style="display: inline;">
             <button type="submit" class="btn btn-primary">Finalizar Pedido</button>
         </form>
     </div>

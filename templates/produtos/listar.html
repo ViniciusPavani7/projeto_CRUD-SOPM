@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container mt-4">
     <h2>Lista de Produtos</h2>
-    <a href="{{ url_for('main.novo_produto') }}" class="btn btn-primary mb-3">Novo Produto</a>
+    <a href="{{ url_for('products.novo_produto') }}" class="btn btn-primary mb-3">Novo Produto</a>
     
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -12,7 +12,7 @@
                     {{ message }}
                     {% if category == 'warning' and 'ID Market que você inseriu já existe' in message %}
                         <div class="mt-2">
-                            <a href="{{ url_for('main.editar_produto', id=produto_existente.id_produto) }}" class="btn btn-warning btn-sm">Sim, editar produto</a>
+                            <a href="{{ url_for('products.editar_produto', id=produto_existente.id_produto) }}" class="btn btn-warning btn-sm">Sim, editar produto</a>
                             <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="alert">Não, cancelar</button>
                         </div>
                     {% else %}
@@ -57,7 +57,7 @@
                 </div>
                 <div class="col-12">
                     <button type="submit" class="btn btn-primary">Filtrar</button>
-                    <a href="{{ url_for('main.listar_produtos') }}" class="btn btn-secondary">Limpar Filtros</a>
+                    <a href="{{ url_for('products.listar_produtos') }}" class="btn btn-secondary">Limpar Filtros</a>
                 </div>
             </form>
         </div>
@@ -85,8 +85,8 @@
                 <td>{{ produto.stock }}</td>
                 <td>{{ produto.id_market }}</td>
                 <td>
-                    <a href="{{ url_for('main.editar_produto', id=produto.id_produto) }}" class="btn btn-sm btn-primary">Editar</a>
-                    <a href="{{ url_for('main.excluir_produto', id=produto.id_produto) }}" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja zerar o estoque deste produto?')">Zerar Estoque</a>
+                    <a href="{{ url_for('products.editar_produto', id=produto.id_produto) }}" class="btn btn-sm btn-primary">Editar</a>
+                    <a href="{{ url_for('products.excluir_produto', id=produto.id_produto) }}" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja zerar o estoque deste produto?')">Zerar Estoque</a>
                 </td>
             </tr>
             {% endfor %}

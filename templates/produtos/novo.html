@@ -4,7 +4,6 @@
 <div class="container mt-4">
     <h2>Novo Produto</h2>
     <form method="POST">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-group mb-3">
             <label for="nome">Nome</label>
             <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome" required>
@@ -31,7 +30,7 @@
         </div>
 
         <button type="submit" class="btn btn-primary">Criar Produto</button>
-        <a href="{{ url_for('main.listar_produtos') }}" class="btn btn-secondary">Cancelar</a>
+        <a href="{{ url_for('products.listar_produtos') }}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
 {% endblock %}

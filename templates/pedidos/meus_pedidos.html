@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+
 <div class="container mt-4">
-    <h2>Lista de Pedidos</h2>
+    <h2 class="mb-4">Meus Pedidos</h2>
     
     <!-- Filtros -->
     <div class="card mb-4">
@@ -15,10 +17,6 @@
                 <div class="col-md-3">
                     <label for="nome" class="form-label">Nome do Produto</label>
                     <input type="text" class="form-control" id="nome" name="nome" value="{{ nome_filtro }}">
-                </div>
-                <div class="col-md-3">
-                    <label for="id_usuario" class="form-label">ID Usuário</label>
-                    <input type="text" class="form-control" id="nome" name="id_usuario" value="{{ id_usuario_filtro }}">
                 </div>
                 <div class="col-md-2">
                     <label for="data" class="form-label">Data</label>
@@ -50,18 +48,27 @@
         </div>
     </div>
 
-    <!-- Tabela de Pedidos -->
+    {% if not pedidos %}
+    <div class="empty-orders-message">
+        <p class="text-muted">
+            <i class="bi bi-cart-x"></i> Você ainda não fez nenhum pedido.
+            <a href="{{ url_for('main.home') }}" class="text-primary">
+                Ver produtos disponíveis
+            </a>
+        </p>
+    </div>
+    {% else %}
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Produto</th>
-                    <th>ID Usuário</th>
+                    <th>Preço Unitário</th>
                     <th>Quantidade</th>
+                    <th>Subtotal</th>
                     <th>Status</th>
                     <th>Data</th>
-                    <th>Ações</th>
                 </tr>
             </thead>
             <tbody>
@@ -69,39 +76,25 @@
                 <tr>
                     <td>{{ pedido.id_pedido }}</td>
                     <td>{{ pedido.produto.nome }}</td>
-                    <td>{{ pedido.id_user }}</td>
+                    <td>R$ {{ "%.2f"|format(pedido.produto.price) }}</td>
                     <td>{{ pedido.qnt_itens }}</td>
+                    <td>R$ {{ "%.2f"|format(pedido.produto.price * pedido.qnt_itens) }}</td>
                     <td>
-                        <span class="badge {% if pedido.status == 'Novo' %}bg-primary{% elif pedido.status == 'Processando' %}bg-info{% elif pedido.status == 'Enviado' %}bg-success{% elif pedido.status == 'Cancelado' %}bg-danger{% else %}bg-secondary{% endif %}">
+                        <span class="badge 
+                            {% if pedido.status == 'Novo' %}bg-primary
+                            {% elif pedido.status == 'Processando' %}bg-info
+                            {% elif pedido.status == 'Enviado' %}bg-success
+                            {% elif pedido.status == 'Cancelado' %}bg-danger
+                            {% else %}bg-secondary{% endif %}">
                             {{ pedido.status }}
                         </span>
                     </td>
                     <td>{{ pedido.date.strftime('%d/%m/%Y %H:%M') }}</td>
-                    <td>
-                        <div class="btn-group">
-                            <form action="{{ url_for('orders.atualizar_status_pedido', id=pedido.id_pedido) }}" method="POST" class="d-inline">
-                                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()" {% if pedido.status == 'Cancelado' %}disabled{% endif %}>
-                                    <option value="Novo" {% if pedido.status == 'Novo' %}selected{% endif %}>Novo</option>
-                                    <option value="Processando" {% if pedido.status == 'Processando' %}selected{% endif %}>Processando</option>
-                                    <option value="Enviado" {% if pedido.status == 'Enviado' %}selected{% endif %}>Enviado</option>
-                                    <option value="Cancelado" {% if pedido.status == 'Cancelado' %}selected{% endif %}>Cancelado</option>
-                                </select>
-                            </form>
-                            
-                            {% if pedido.status != 'Cancelado' %}
-                            <form action="{{ url_for('orders.atualizar_status_pedido', id=pedido.id_pedido) }}" method="POST" class="d-inline ms-2">
-                                <input type="hidden" name="status" value="Cancelado">
-                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja cancelar este pedido?')">
-                                    Cancelar
-                                </button>
-                            </form>
-                            {% endif %}
-                        </div>
-                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+    {% endif %}
 </div>
-{% endblock %} 
+{% endblock %}
