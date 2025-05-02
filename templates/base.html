@@ -34,12 +34,14 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('products.listar_produtos') }}">Produtos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('orders.listar_pedidos') }}">Pedidos</a>
-                    </li>
+                    {% if current_user.is_authenticated and current_user.role.value == 'admin' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('products.listar_produtos') }}">Produtos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('orders.listar_pedidos') }}">Pedidos</a>
+                        </li>
+                    {% endif %}
                 </ul>
                 
                 <div class="d-flex">
