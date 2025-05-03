@@ -32,7 +32,7 @@ def auth_unified():
                 # Gera token JWT
                 access_token = create_access_token(
                     identity=str(usuario.id),
-                    additional_claims={'role': usuario.role}
+                    additional_claims={'role': usuario.role.value}
                 )
 
                 # Configura resposta com cookies
