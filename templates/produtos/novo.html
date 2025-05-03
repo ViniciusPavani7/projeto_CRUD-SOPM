@@ -3,30 +3,75 @@
 {% block content %}
 <div class="container mt-4">
     <h2>Novo Produto</h2>
+    
+    <!-- Mensagens Flash (sucesso/erro) -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Bloco de conflito de ID Market -->
+    {% if produto_existente %}
+    <div class="alert alert-warning mt-3">
+        <h5>⚠️ ATENÇÃO: ID Market já cadastrado!</h5>
+        <p class="mb-3">
+            O ID <strong>{{ form_data.id_market }}</strong> já está sendo usado pelo produto:<br>
+            <strong>{{ produto_existente.nome }}</strong> (Estoque atual: {{ produto_existente.stock }})
+        </p>
+        
+        <div class="d-flex gap-3">
+            <!-- Opção 1: Adicionar ao estoque existente -->
+            <form method="POST" action="{{ url_for('products.adicionar_estoque') }}">
+                <input type="hidden" name="id_produto" value="{{ produto_existente.id_produto }}">
+                <input type="hidden" name="quantidade" value="{{ form_data.stock }}">
+                <button type="submit" class="btn btn-warning">
+                    Adicionar {{ form_data.stock }} unidades ao estoque existente
+                </button>
+            </form>
+            
+            <!-- Opção 2: Alterar ID Market -->
+            <button class="btn btn-outline-primary" onclick="document.getElementById('id_market').focus()">
+                ↻ Alterar ID Market para criar novo produto
+            </button>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Formulário principal (mantém todos os campos preenchidos) -->
     <form method="POST">
         <div class="form-group mb-3">
             <label for="nome">Nome</label>
-            <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome" required>
+            <input type="text" class="form-control" id="nome" name="nome" 
+                   value="{{ form_data.nome if form_data }}" placeholder="Nome" required>
         </div>
         
         <div class="form-group mb-3">
             <label for="id_market">ID Market</label>
-            <input type="text" class="form-control" id="id_market" name="id_market" placeholder="ID Market" required>
+            <input type="text" class="form-control" id="id_market" name="id_market" 
+                   value="{{ form_data.id_market if form_data }}" placeholder="ID Market" required>
         </div>
         
         <div class="form-group mb-3">
             <label for="price">Preço</label>
-            <input type="number" step="0.01" class="form-control" id="price" name="price" placeholder="Preço" required>
+            <input type="number" step="0.01" class="form-control" id="price" name="price" 
+                   value="{{ form_data.price if form_data }}" placeholder="Preço" required>
         </div>
         
         <div class="form-group mb-3">
             <label for="stock">Quantia</label>
-            <input type="number" class="form-control" id="stock" name="stock" placeholder="Quantidade em estoque" required>
+            <input type="number" class="form-control" id="stock" name="stock" 
+                   value="{{ form_data.stock if form_data }}" placeholder="Quantidade em estoque" required>
         </div>
         
         <div class="form-group mb-3">
             <label for="descricao">Descrição</label>
-            <textarea class="form-control" id="descricao" name="descricao" placeholder="Descrição do produto" rows="3"></textarea>
+            <textarea class="form-control" id="descricao" name="descricao" 
+                      placeholder="Descrição do produto" rows="3">{{ form_data.descricao if form_data }}</textarea>
         </div>
 
         <button type="submit" class="btn btn-primary">Criar Produto</button>

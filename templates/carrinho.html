@@ -31,9 +31,7 @@
                     <td>
                         <form action="{{ url_for('cart.atualizar_quantidade', produto_id=item.produto_id) }}" method="POST" class="d-flex align-items-center" style="max-width: 150px;">
                             <div class="input-group">
-                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="this.parentElement.querySelector('input').stepDown()">-</button>
                                 <input type="number" name="quantidade" value="{{ item.qnt_itens }}" min="1" class="form-control form-control-sm text-center" onchange="this.form.submit()">
-                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="this.parentElement.querySelector('input').stepUp()">+</button>
                             </div>
                         </form>
                     </td>
@@ -58,9 +56,6 @@
     </div>
     <div class="text-end mt-3">
         <a href="{{ url_for('main.home') }}" class="btn btn-secondary">Continuar Comprando</a>
-        <form action="{{ url_for('cart.finalizar_carrinho') }}" method="POST" style="display: inline;">
-            <button type="submit" class="btn btn-danger">Limpar Carrinho</button>
-        </form>
         <form action="{{ url_for('cart.finalizar_carrinho') }}" method="POST" style="display: inline;">
             <button type="submit" class="btn btn-primary">Finalizar Pedido</button>
         </form>

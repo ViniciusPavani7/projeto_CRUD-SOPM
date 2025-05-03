@@ -46,26 +46,54 @@ def listar_produtos():
 @bp.route('/produtos/novo/', methods=['GET', 'POST'])
 def novo_produto():
     if request.method == 'POST':
+        id_market = request.form['id_market']
+        produto_existente = Produto.query.filter_by(
+            id_market=id_market).first()
+
+        # Se o ID Market já existe, mostra opções
+        if produto_existente:
+            flash(
+                f'O ID Market "{id_market}" já está em uso pelo produto "{produto_existente.nome}". '
+                'Escolha uma opção abaixo:',
+                'warning'
+            )
+            return render_template(
+                'produtos/novo.html',
+                produto_existente=produto_existente,
+                form_data=request.form  # Mantém os dados do formulário
+            )
+
+        # Se não existe, cria o produto
         try:
             produto = Produto(
                 nome=request.form['nome'],
                 descricao=request.form['descricao'],
                 price=request.form['price'],
                 stock=request.form['stock'],
-                id_market=request.form['id_market']
+                id_market=id_market
             )
             db.session.add(produto)
             db.session.commit()
             flash('Produto criado com sucesso!', 'success')
             return redirect(url_for('products.listar_produtos'))
-        except IntegrityError:
+
+        except Exception as e:
             db.session.rollback()
-            produto_existente = Produto.query.filter_by(
-                id_market=request.form['id_market']).first()
-            flash(
-                f'O ID Market que você inseriu já existe. Deseja apenas aumentar o estoque? (Produto existente: {produto_existente.nome})', 'warning')
-            return redirect(url_for('products.listar_produtos', id_market=request.form['id_market']))
+            flash(f'Erro ao criar produto: {str(e)}', 'danger')
+
     return render_template('produtos/novo.html')
+
+
+@bp.route('/produtos/adicionar-estoque', methods=['POST'])
+def adicionar_estoque():
+    produto = Produto.query.get_or_404(request.form['id_produto'])
+    produto.stock += int(request.form['quantidade'])
+    db.session.commit()
+    flash(
+        f'Estoque de {produto.nome} atualizado! Total: {produto.stock} unidades',
+        'success'
+    )
+    return redirect(url_for('products.listar_produtos'))
 
 
 @bp.route('/produtos/editar/<int:id>/', methods=['GET', 'POST'])
