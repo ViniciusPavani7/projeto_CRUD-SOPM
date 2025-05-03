@@ -29,7 +29,7 @@ def upgrade():
                         precision=12, scale=2), nullable=False),
                     sa.Column('stock', sa.Integer(), nullable=False),
                     sa.Column('id_market', sa.String(
-                        length=50), nullable=True),
+                        length=50), nullable=False, unique=True),
                     sa.PrimaryKeyConstraint('id_produto')
                     )
     op.create_table('users',
