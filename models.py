@@ -12,7 +12,7 @@ class Produto(db.Model):
     descricao = db.Column(db.Text)
     price = db.Column(db.Numeric(12, 2), nullable=False)
     stock = db.Column(db.Integer, nullable=False)
-    id_market = db.Column(db.String(50))
+    id_market = db.Column(db.String(50), unique=True)
 
     pedidos = db.relationship('Pedido', backref='produto', lazy=True)
 
