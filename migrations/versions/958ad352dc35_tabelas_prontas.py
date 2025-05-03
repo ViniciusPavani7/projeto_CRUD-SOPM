@@ -80,8 +80,8 @@ def upgrade():
 
     # Gerando hashes com bcrypt (igual ao seu modelo)
     admin_hash = bcrypt.hashpw(
-        b'senha_admin_segura', bcrypt.gensalt()).decode('utf-8')
-    user_hash = bcrypt.hashpw(b'senha_user_segura',
+        b'admin', bcrypt.gensalt()).decode('utf-8')
+    user_hash = bcrypt.hashpw(b'user',
                               bcrypt.gensalt()).decode('utf-8')
 
     op.bulk_insert(users_table,
